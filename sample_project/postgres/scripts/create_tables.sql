@@ -5,15 +5,15 @@ CREATE TYPE type_opensky AS
   (icao24 TEXT,
    callsign TEXT,
    origin_country TEXT,
-   time_position TIMESTAMPTZ,
-   last_contact TIMESTAMPTZ,
+   time_position BIGINT,
+   last_contact BIGINT,
    longitude FLOAT,
    latitude FLOAT,
    -- not in source 
    geom geometry(Point,4326)
   );
 
---CREATE TABLE faunabit_locations OF type_faunabit_locations (
+--CREATE TABLE opensky OF type_opensky (
 --    PRIMARY KEY (id)
 --);
 
@@ -26,7 +26,7 @@ SELECT *
 FROM opensky_raw, jsonb_populate_record(
     null::type_opensky,
     data
-  );
+  ) WITH NO DATA;
 
 CREATE OR REPLACE PROCEDURE update_table_opensky()
 LANGUAGE SQL
@@ -38,9 +38,10 @@ INSERT INTO opensky(
   FROM opensky_raw, jsonb_populate_record(
     null::type_opensky,
     data));
-UPDATE opensky SET geom = ST_SetSRID(ST_Makepoint(lon,lat),4326);
+UPDATE opensky SET geom = ST_SetSRID(ST_Makepoint(longitude,latitude),4326);
 $BODY$;
 
 CALL update_table_opensky();
---SELECT cron.schedule('* * * * *', $$CALL update_table_opensky()$$);
 
+--SELECT cron.schedule('* * * * *', $$CALL update_table_opensky()$$);
+--
