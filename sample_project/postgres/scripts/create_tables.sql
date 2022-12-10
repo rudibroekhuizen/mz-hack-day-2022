@@ -28,20 +28,20 @@ FROM opensky_raw, jsonb_populate_record(
     data
   );
 
-CREATE OR REPLACE PROCEDURE update_table_faunabit_locations()
+CREATE OR REPLACE PROCEDURE update_table_opensky()
 LANGUAGE SQL
 AS $BODY$
-TRUNCATE TABLE faunabit_locations_raw;
-COPY faunabit_locations_raw (data) FROM '/mnt/share/faunabit_locations.json' CSV QUOTE e'\x01' DELIMITER e'\x02';
-TRUNCATE TABLE faunabit_locations;
-INSERT INTO faunabit_locations(
+TRUNCATE TABLE opensky_raw;
+COPY opensky_raw (data) FROM '/var/lib/postgresql/scripts/opensky.jsonl' CSV QUOTE e'\x01' DELIMITER e'\x02';
+TRUNCATE TABLE opensky;
+INSERT INTO opensky(
   SELECT *
-  FROM faunabit_locations_raw, jsonb_populate_record(
-    null::type_faunabit_locations,
+  FROM opensky_raw, jsonb_populate_record(
+    null::type_opensky,
     data));
-UPDATE faunabit_locations SET geom = ST_SetSRID(ST_Makepoint(lon,lat),4326);
+UPDATE opensky SET geom = ST_SetSRID(ST_Makepoint(lon,lat),4326);
 $BODY$;
 
-CALL update_table_faunabit_locations();
-SELECT cron.schedule('* * * * *', $$CALL update_table_faunabit_locations()$$);
+CALL update_table_opensky();
+--SELECT cron.schedule('* * * * *', $$CALL update_table_opensky()$$);
 
