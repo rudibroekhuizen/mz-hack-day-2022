@@ -31,27 +31,3 @@ RUN set -x && \
     cd postgresql-hll && \
     make && \
     make install
-
-# Install go
-RUN set -x && \
-    cd /opt && \
-    wget -q "https://go.dev/dl/go1.18.linux-amd64.tar.gz" && \
-    tar -xvf go1.18.linux-amd64.tar.gz && \
-    ln -s /opt/go/bin/go /usr/local/bin/go
-
-# Install irodsfs
-RUN set -x && \
-    cd /opt && \
-    git clone -b v0.7.9 https://github.com/cyverse/irodsfs && \
-    cd irodsfs && \
-    make build && \
-    ln -s /opt/irodsfs/bin/irodsfs /usr/local/bin/irodsfs && \
-    mkdir -p /mnt/irodsfs/tempZone && \
-    chown -R postgres:postgres /mnt/irodsfs/tempZone
-
-# Install fio extension 
-RUN set -x && \
-    cd /opt && \
-    git clone https://github.com/csimsek/pgsql-fio && \
-    cd pgsql-fio && \
-    make install
