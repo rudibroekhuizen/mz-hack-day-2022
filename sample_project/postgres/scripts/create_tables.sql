@@ -33,7 +33,6 @@ LANGUAGE SQL
 AS $BODY$
 TRUNCATE TABLE opensky_raw;
 COPY opensky_raw (data) FROM '/var/lib/postgresql/scripts/opensky.jsonl' CSV QUOTE e'\x01' DELIMITER e'\x02';
-TRUNCATE TABLE opensky;
 INSERT INTO opensky(
   SELECT *
   FROM opensky_raw, jsonb_populate_record(
